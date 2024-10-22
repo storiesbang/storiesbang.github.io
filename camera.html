@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>開啟相機與計時</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f4;
+        }
+
+        h1 {
+            color: #333;
+        }
+
+        video {
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            border: 2px solid #333;
+            margin-bottom: 20px;
+        }
+
+        button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 16px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .image-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        .image-grid button {
+            width: 100px;
+            height: 100px;
+            border: 2px solid #333;
+            border-radius: 8px;
+            background-size: cover;
+            background-position: center;
+            background-color: transparent;
+            cursor: pointer;
+        }
+
+        #timeDisplay {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>開啟裝置相機並計時</h1>
+    <video id="video" autoplay></video>
+    <button id="startCamera">開啟相機</button>
+
+    <!-- 2x2 圖片按鈕 -->
+    <div class="image-grid">
+        <button id="imgButton1" style="background-image: url('https://www.shutterstock.com/image-vector/black-rectangular-prism-vector-illustration-260nw-1390391165.jpg');"></button>
+        <button id="imgButton2" style="background-image: url('https://www.shutterstock.com/image-vector/black-cylinder-3d-geometric-shape-260nw-327554771.jpg');"></button>
+        <button id="imgButton3" style="background-image: url('https://media.istockphoto.com/id/1053016666/photo/sphere-round-button-black-matted-ball-basic-circle-geometric.jpg?s=612x612&w=0&k=20&c=Czgh9WMm1dG2rCMdyoScKEqbOTCvkt5I_68ypghlKYo=');"></button>
+        <button id="imgButton4" style="background-image: url('https://atlas-content-cdn.pixelsquid.com/stock-images/cone-black-geometric-shape-e17P886-600.jpg');"></button>
+    </div>
+
+    <!-- 顯示計時結果 -->
+    <div id="timeDisplay">按下按鈕以顯示時間</div>
+
+    <script>
+        const video = document.getElementById('video');
+        const startButton = document.getElementById('startCamera');
+        const timeDisplay = document.getElementById('timeDisplay');
+        let startTime;
+
+        // 開啟相機並開始計時
+        startButton.addEventListener('click', async () => {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment' // 使用後置相機
+                    }
+                });
+                video.srcObject = stream;
+                startTime = performance.now(); // 記錄開始時間（毫秒）
+            } catch (err) {
+                console.error("相機無法開啟:", err);
+                alert('無法存取相機，請確認您的瀏覽器設置是否允許相機存取。');
+            }
+        });
+
+        // 處理圖片按鈕按下事件
+        function handleButtonClick() {
+            const endTime = performance.now(); // 記錄結束時間
+            const timeElapsed = (endTime - startTime) / 1000; // 將毫秒轉換為秒
+            timeDisplay.textContent = `從開啟相機到按下按鈕經過的時間: ${timeElapsed.toFixed(3)} 秒`;
+        }
+
+        // 監聽圖片按鈕的點擊事件
+        document.getElementById('imgButton1').addEventListener('click', handleButtonClick);
+        document.getElementById('imgButton2').addEventListener('click', handleButtonClick);
+        document.getElementById('imgButton3').addEventListener('click', handleButtonClick);
+        document.getElementById('imgButton4').addEventListener('click', handleButtonClick);
+    </script>
+
+</body>
+</html>
