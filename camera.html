@@ -3,122 +3,194 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>開啟相機與計時</title>
+    <title>模式選擇與相機計時</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        body, html {
             margin: 0;
             padding: 0;
+            overflow: hidden;
+            width: 100vw;
+            height: 100vh;
+            font-family: Arial, sans-serif;
             display: flex;
-            flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            background-color: #f4f4f4;
+            flex-direction: column;
         }
 
-        h1 {
-            color: #333;
-        }
-
-        video {
-            width: 100%;
-            max-width: 400px;
-            height: auto;
-            border: 2px solid #333;
+        /* 模式選擇頁面 */
+        .mode-selection {
+            display: flex;
+            gap: 30px;
             margin-bottom: 20px;
         }
 
-        button {
-            padding: 10px 20px;
+        .mode-button {
+            padding: 20px 40px;
             background-color: #007bff;
             color: white;
             border: none;
             cursor: pointer;
-            font-size: 16px;
+            font-size: 32px;
             border-radius: 5px;
-            margin-bottom: 20px;
         }
 
-        button:hover {
-            background-color: #0056b3;
+        /* 相機與按鈕頁面 */
+        .camera-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: none; /* 隱藏，直到模式選擇 */
         }
 
-        .image-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
+        video {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
         }
 
-        .image-grid button {
-            width: 100px;
-            height: 100px;
-            border: 2px solid #333;
+        /* 圖形按鈕樣式 */
+        .shape-button {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            border: 0px solid #333;
             border-radius: 8px;
             background-size: cover;
             background-position: center;
             background-color: transparent;
             cursor: pointer;
+            z-index: 2;
         }
 
+        /* 計時顯示 */
         #timeDisplay {
-            margin-top: 20px;
-            font-size: 18px;
-            color: #007bff;
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 3;
+            font-size: 36px;
+            color: white;
+            background-color: rgba(0, 0, 0, 0.6);
+            padding: 10px;
+            border-radius: 8px;
         }
     </style>
 </head>
 <body>
 
-    <h1>開啟裝置相機並計時</h1>
-    <video id="video" autoplay></video>
-    <button id="startCamera">開啟相機</button>
-
-    <!-- 2x2 圖片按鈕 -->
-    <div class="image-grid">
-        <button id="imgButton1" style="background-image: url('https://www.shutterstock.com/image-vector/black-rectangular-prism-vector-illustration-260nw-1390391165.jpg');"></button>
-        <button id="imgButton2" style="background-image: url('https://www.shutterstock.com/image-vector/black-cylinder-3d-geometric-shape-260nw-327554771.jpg');"></button>
-        <button id="imgButton3" style="background-image: url('https://media.istockphoto.com/id/1053016666/photo/sphere-round-button-black-matted-ball-basic-circle-geometric.jpg?s=612x612&w=0&k=20&c=Czgh9WMm1dG2rCMdyoScKEqbOTCvkt5I_68ypghlKYo=');"></button>
-        <button id="imgButton4" style="background-image: url('https://atlas-content-cdn.pixelsquid.com/stock-images/cone-black-geometric-shape-e17P886-600.jpg');"></button>
+    <!-- 模式選擇頁面 -->
+    <div class="mode-selection">
+        <button class="mode-button" onclick="selectMode(1)">Mode 1</button>
+        <button class="mode-button" onclick="selectMode(2)">Mode 2</button>
+        <button class="mode-button" onclick="selectMode(3)">Mode 3</button>
+        <button class="mode-button" onclick="selectMode(4)">Mode 4</button>
     </div>
 
-    <!-- 顯示計時結果 -->
-    <div id="timeDisplay">按下按鈕以顯示時間</div>
+    <!-- 相機與按鈕頁面 -->
+    <div class="camera-container" id="cameraContainer">
+        <video id="video" autoplay></video>
+
+        <!-- 四個圖形按鈕 -->
+        <button id="shapeButton1" class="shape-button"></button>
+        <button id="shapeButton2" class="shape-button"></button>
+        <button id="shapeButton3" class="shape-button"></button>
+        <button id="shapeButton4" class="shape-button"></button>
+
+        <!-- 計時顯示 -->
+        <div id="timeDisplay">請選擇正確的圖形</div>
+    </div>
 
     <script>
-        const video = document.getElementById('video');
-        const startButton = document.getElementById('startCamera');
-        const timeDisplay = document.getElementById('timeDisplay');
+        let video = document.getElementById('video');
+        let cameraContainer = document.getElementById('cameraContainer');
+        let timeDisplay = document.getElementById('timeDisplay');
+        let correctButtonId;
         let startTime;
+        let cameraStream;
 
-        // 開啟相機並開始計時
-        startButton.addEventListener('click', async () => {
+        // 圖形按鈕的獨立配置
+        const buttonConfigs = [
+            { id: 'shapeButton1', imageUrl: 'nobgrec.png' },
+            { id: 'shapeButton2', imageUrl: 'nobgcylin.png' },
+            { id: 'shapeButton3', imageUrl: 'nobgsph.png' },
+            { id: 'shapeButton4', imageUrl: 'nobgcone.png' }
+        ];
+
+        // 請求相機權限並預先準備
+        async function requestCameraAccess() {
             try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    video: {
-                        facingMode: 'environment' // 使用後置相機
-                    }
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' }
                 });
-                video.srcObject = stream;
-                startTime = performance.now(); // 記錄開始時間（毫秒）
+                video.srcObject = cameraStream;
             } catch (err) {
                 console.error("相機無法開啟:", err);
                 alert('無法存取相機，請確認您的瀏覽器設置是否允許相機存取。');
             }
-        });
-
-        // 處理圖片按鈕按下事件
-        function handleButtonClick() {
-            const endTime = performance.now(); // 記錄結束時間
-            const timeElapsed = (endTime - startTime) / 1000; // 將毫秒轉換為秒
-            timeDisplay.textContent = `從開啟相機到按下按鈕經過的時間: ${timeElapsed.toFixed(3)} 秒`;
         }
 
-        // 監聽圖片按鈕的點擊事件
-        document.getElementById('imgButton1').addEventListener('click', handleButtonClick);
-        document.getElementById('imgButton2').addEventListener('click', handleButtonClick);
-        document.getElementById('imgButton3').addEventListener('click', handleButtonClick);
-        document.getElementById('imgButton4').addEventListener('click', handleButtonClick);
+        // 頁面載入時請求相機權限
+        window.onload = () => {
+            requestCameraAccess();
+        };
+
+        function selectMode(mode) {
+            // 隱藏模式選擇頁面，顯示相機頁面
+            document.querySelector('.mode-selection').style.display = 'none';
+            cameraContainer.style.display = 'block';
+
+            // 指定模式的正確答案
+            correctButtonId = 'shapeButton' + mode;
+            
+            // 開始計時並生成隨機按鈕
+            startTime = performance.now();
+            generateRandomButtons();
+        }
+
+        function generateRandomButtons() {
+            const buttonPositions = [
+                { top: '20px', left: '20px' },
+                { top: '20px', right: '20px' },
+                { bottom: '20px', left: '20px' },
+                { bottom: '20px', right: '20px' }
+            ];
+
+            // 隨機分配按鈕到四個位置
+            buttonPositions.sort(() => Math.random() - 0.5);
+
+            // 為每個按鈕設置不同的圖片和位置
+            buttonConfigs.forEach((config, index) => {
+                const button = document.getElementById(config.id);
+                const position = buttonPositions[index];
+                
+                button.style.top = position.top || '';
+                button.style.left = position.left || '';
+                button.style.right = position.right || '';
+                button.style.bottom = position.bottom || '';
+                button.style.backgroundImage = `url('${config.imageUrl}')`;
+
+                // 設置按鈕事件
+                button.onclick = () => handleButtonClick(button.id);
+            });
+        }
+
+        function handleButtonClick(clickedButtonId) {
+            const endTime = performance.now();
+            const timeElapsed = (endTime - startTime) / 1000;
+            
+            if (clickedButtonId === correctButtonId) {
+                timeDisplay.textContent = `正確 ${timeElapsed.toFixed(3)} 秒`;
+                timeDisplay.classList.add("correct-message");
+            } else {
+                timeDisplay.textContent = `錯誤！請重新選擇正確的圖形。`;
+            }
+        }
     </script>
 
 </body>
