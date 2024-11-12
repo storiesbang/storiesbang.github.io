@@ -65,8 +65,8 @@
             background-color: transparent;
             cursor: pointer;
             z-index: 2;
+            bottom: calc(5vh); /* 或距離螢幕底部一定的視窗高度 */
         }
-
         /* 計時顯示 */
         #timeDisplay {
             position: absolute;
@@ -86,10 +86,10 @@
 
     <!-- 模式選擇頁面 -->
     <div class="mode-selection">
-        <button class="mode-button" onclick="selectMode(1)">Mode 1</button>
-        <button class="mode-button" onclick="selectMode(2)">Mode 2</button>
-        <button class="mode-button" onclick="selectMode(3)">Mode 3</button>
-        <button class="mode-button" onclick="selectMode(4)">Mode 4</button>
+        <button class="mode-button" onclick="selectMode(1)">模式 1</button>
+        <button class="mode-button" onclick="selectMode(2)">模式 2</button>
+        <button class="mode-button" onclick="selectMode(3)">模式 3</button>
+        <button class="mode-button" onclick="selectMode(4)">模式 4</button>
     </div>
 
     <!-- 相機與按鈕頁面 -->
