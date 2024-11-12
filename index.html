@@ -71,10 +71,19 @@
             height: 250px;
             margin:50px;
         }
-        #shapeButton4 {
-            width: 280px;
-            height: 280px;
-            margin:15px;
+        @media (orientation: landscape) {
+            /* 橫向模式下縮小按鈕尺寸 */
+            .shape-button {
+                width: 200px;
+                height: 200px;
+            }
+            #shapeButton3 {
+                width: 150px;
+                height: 150px;
+            }
+            #timeDisplay {
+                font-size: 20px; /* 調整文字大小 */
+            }
         }
         /* 計時顯示 */
         #timeDisplay {
