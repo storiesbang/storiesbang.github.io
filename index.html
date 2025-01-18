@@ -187,11 +187,18 @@
             });
         }
 
+        let hasAnswered = false; // 用於追蹤是否已經回答過
+
         function handleButtonClick(clickedButtonId) {
+            if (hasAnswered) {
+                // 如果已經回答過，直接返回，避免刷新
+                return;
+            }       
             const endTime = performance.now();
             const timeElapsed = (endTime - startTime) / 1000;
             
             if (clickedButtonId === correctButtonId) {
+                hasAnswered = true;
                 timeDisplay.textContent = `正確 ${timeElapsed.toFixed(3)} 秒`;
                 timeDisplay.classList.add("correct-message");
             } else {
