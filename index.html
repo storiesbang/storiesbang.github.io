@@ -19,9 +19,29 @@
             touch-action: manipulation;
         }
 
+        /* 顏色選擇頁面 */
+        .color-selection {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 20px;
+        }
+
+        .color-button {
+            padding: 20px 40px;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-size: 32px;
+            border-radius: 5px;
+        }
+
+        #blackButton { background-color: #000000; }
+        #blueButton { background-color: #0000FF; }
+        #redButton { background-color: #FF0000; }
+
         /* 模式選擇頁面 */
         .mode-selection {
-            display: flex;
+            display: none;
             gap: 30px;
             margin-bottom: 20px;
         }
@@ -91,6 +111,12 @@
     </style>
 </head>
 <body>
+    <!-- 顏色選擇頁面 -->
+    <div class="color-selection">
+        <button class="color-button" id="blackButton" onclick="selectColor('black')">黑色</button>
+        <button class="color-button" id="blueButton" onclick="selectColor('blue')">藍色</button>
+        <button class="color-button" id="redButton" onclick="selectColor('red')">紅色</button>
+    </div>
 
     <!-- 模式選擇頁面 -->
     <div class="mode-selection">
@@ -121,6 +147,7 @@
         let correctButtonId;
         let startTime;
         let cameraStream;
+        let selectedColor = '';
 
         // 圖形按鈕的獨立配置
         const buttonConfigs = [
@@ -161,6 +188,22 @@
             generateRandomButtons();
         }
 
+        function selectColor(color) {
+            selectedColor = color;
+            document.querySelector('.color-selection').style.display = 'none';
+            document.querySelector('.mode-selection').style.display = 'flex';
+        }
+
+        // 修改 buttonConfigs 為函數
+        function getButtonConfigs() {
+            return [
+                { id: 'shapeButton1', imageUrl: `nobgrec_${selectedColor}.png` },
+                { id: 'shapeButton2', imageUrl: `nobgcylin2_${selectedColor}.png` },
+                { id: 'shapeButton3', imageUrl: `nobgsph_${selectedColor}.png` },
+                { id: 'shapeButton4', imageUrl: `nobgcone_${selectedColor}.png` }
+            ];
+        }
+
         function generateRandomButtons() {
             const buttonPositions = [
                 { top: '20px', left: '20px' },
@@ -169,11 +212,10 @@
                 { bottom: '20px', right: '20px' }
             ];
 
-            // 隨機分配按鈕到四個位置
             buttonPositions.sort(() => Math.random() - 0.5);
 
-            // 為每個按鈕設置不同的圖片和位置
-            buttonConfigs.forEach((config, index) => {
+            // 使用 getButtonConfigs() 來獲取當前顏色的配置
+            getButtonConfigs().forEach((config, index) => {
                 const button = document.getElementById(config.id);
                 const position = buttonPositions[index];
                 
@@ -183,7 +225,6 @@
                 button.style.bottom = position.bottom || '';
                 button.style.backgroundImage = `url('${config.imageUrl}')`;
 
-                // 設置按鈕事件
                 button.onclick = () => handleButtonClick(button.id);
             });
         }
