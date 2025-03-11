@@ -88,6 +88,7 @@
             z-index: 2;
             padding:5px;
         }
+
         #shapeButton3 {
             width: 250px;
             height: 250px;
@@ -149,14 +150,6 @@
         let cameraStream;
         let selectedColor = '';
 
-        // 圖形按鈕的獨立配置
-        const buttonConfigs = [
-            { id: 'shapeButton1', imageUrl: 'nobgrec.png' },
-            { id: 'shapeButton2', imageUrl: 'nobgcylin2.png' },
-            { id: 'shapeButton3', imageUrl: 'nobgsph.png' },
-            { id: 'shapeButton4', imageUrl: 'nobgcone.png' }
-        ];
-
         // 請求相機權限並預先準備
         async function requestCameraAccess() {
             try {
@@ -194,16 +187,6 @@
             document.querySelector('.mode-selection').style.display = 'flex';
         }
 
-        // 修改 buttonConfigs 為函數
-        function getButtonConfigs() {
-            return [
-                { id: 'shapeButton1', imageUrl: `nobgrec_${selectedColor}.png` },
-                { id: 'shapeButton2', imageUrl: `nobgcylin2_${selectedColor}.png` },
-                { id: 'shapeButton3', imageUrl: `nobgsph_${selectedColor}.png` },
-                { id: 'shapeButton4', imageUrl: `nobgcone_${selectedColor}.png` }
-            ];
-        }
-
         function generateRandomButtons() {
             const buttonPositions = [
                 { top: '20px', left: '20px' },
@@ -214,8 +197,14 @@
 
             buttonPositions.sort(() => Math.random() - 0.5);
 
-            // 使用 getButtonConfigs() 來獲取當前顏色的配置
-            getButtonConfigs().forEach((config, index) => {
+            const configs = [
+                { id: 'shapeButton1', imageUrl: `nobgrec_${selectedColor}.png` },
+                { id: 'shapeButton2', imageUrl: `nobgcylin2_${selectedColor}.png` },
+                { id: 'shapeButton3', imageUrl: `nobgsph_${selectedColor}.png` },
+                { id: 'shapeButton4', imageUrl: `nobgcone_${selectedColor}.png` }
+            ];
+
+            configs.forEach((config, index) => {
                 const button = document.getElementById(config.id);
                 const position = buttonPositions[index];
                 
