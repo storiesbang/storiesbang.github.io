@@ -108,6 +108,21 @@
             border-radius: 8px;
             margin: 10px;
         }
+        #backButton {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 72px;
+            padding: 50px 100px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            z-index: 4;
+            display: none;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
@@ -138,6 +153,9 @@
 
         <!-- 計時顯示 -->
         <div id="timeDisplay">請選擇正確的圖形</div>
+
+        <!-- 返回按鈕 -->
+        <button id="backButton">返回</button>
     </div>
 
     <script>
@@ -231,10 +249,16 @@
                 hasAnswered = true;
                 timeDisplay.textContent = `正確 ${timeElapsed.toFixed(3)} 秒`;
                 timeDisplay.classList.add("correct-message");
+                // 顯示返回按鈕
+                document.getElementById('backButton').style.display = 'block';
             } else {
                 timeDisplay.textContent = `錯誤！請重新選擇正確的圖形。`;
             }
         }
+        // 返回按鈕事件：重整頁面
+        document.getElementById('backButton').addEventListener('click', () => {
+            location.reload();
+        });
     </script>
 
 </body>
